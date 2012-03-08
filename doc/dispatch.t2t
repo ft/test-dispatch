@@ -1,0 +1,202 @@
+DISPATCH
+
+March, 2012
+
+%!target: man
+%!postproc(man): "^(\.TH.*) 1 "  "\1 1 "
+
+
+= NAME =
+dispatch - Transparently call code with different interpreters
+
+
+= SYNOPSIS =
+
+//dispatch// **program-to-execute**
+
+
+= DESCRIPTION =
+
+If you have a test suite that is made up of code in many different languages
+and you want to run all those test files within one harness, like Perl's
+`prove(1)', you will have to find a way to run those files with different
+interpreters with prove's `--exec' option. //dispatch// is a way to do that.
+
+It is important for this to work, that //dispatch// is able to tell which
+interpreter is required for a file. You could just rely on scripts shebang
+lines. But what if on someone elses system the interpreter is in a different
+place? What if it's not the right interpreter at all? What if you need to pass
+a set of options to the interpreter? What about compiled code, which doesn't
+have a shebang like at all? Another way might be to model something around the
+output of `file(1)' and hope that will turn out correctly on a wide variety of
+systems. There are worse ideas than these. But I think the most robust way to
+deal with this is to have the file name announce which file type it is.
+
+Hence, to use this you need to enforce a file name policy:
+
+a) File names may not contain a new-line character.
+
+b) File names end in "//-//**<language-indentifier>**//.t//". The
+`language-identifier' may not contain a dash.
+
+
+The constraint in `a)' enables you to feed file-names line by line into
+
+  prove -
+
+The constraint in `b)' serves two purposes: 1. you can scan a deep test tree
+using find(1) looking for files that match "*.t". 2. //dispatch// can tell,
+what language a file is implemented in (see //RECOGNISED LANGUAGES// below).
+
+
+= RECOGNISED LANGUAGES =
+
+Here is a list of recognised languages tags, with their associated interpreter
+environment variables and their default values:
+
+: **hs**: //Haskell// ($HASKELL_INTERPRETER, default: "runhaskell")
+: **pl**: //Perl// ($PERL_INTERPRETER, default: "perl")
+: **py**: //Python// ($PYTHON_INTERPRETER, default: "python")
+: **rb**: //Ruby// ($RUBY_INTERPRETER, default: "ruby")
+: **scm**: //Scheme// ($SCHEME_INTERPRETER, default: "guile")
+: **sh**: //Shell// ($SHELL_INTERPRETER, default: "/bin/sh")
+
+
+And to support compiled code from any language, too, the `**c**' language
+identifier was introduced (`c' for **c**ompiled code, not just the C language).
+
+
+= DISPATCHING SEQUENCE =
+
+This section describes the operation of the //dispatch// script in detail (the
+following assumes the filename to be **"foobar-scm.t"**).
+
+First, sanity checks are performed: Does the file exist? Is it readable? Does
+the file name match the naming policy?
+
+Then the file name is disected into its base name and the language-identifier.
+In the example, that would be "foobar" as the base name and "scm" as the
+language identifier, which would set the file type to "scheme".
+
+In the next step, language specific setup is done and language specific
+information is assigned to language agnostic ones.
+
+Next, a language specific file is //sourced// (example: **"scheme.env"**). This
+file is looked up in "$DISPATCH_ROOT", unlike all other files, that live in the
+same directory as the test file.
+
+Then, a test-script specific file is //sourced// (example: **"foobar.env"**).
+
+After that, a test-script specific file is //run// (not sourced!). This file
+may be used to setup an environment for the test code to run in. (example:
+**"foobar.setup"**)
+
+Only now is the actual test code is run (see //HOW CODE IS RUN// below).
+
+And finally, another test-script specific file is //run//. This may be used to
+clean up a previously set-up environment. (example: **"foobar.teardown"**).
+
+
+= HOW CODE IS RUN =
+
+The interpreter used to run a piece of code is in the
+`//$DISPATCH_INTERPRETER//' variable. Options to it may be specified in the
+`//$DISPATCH_INTERPRETER_OPTIONS//' variable.
+
+The former defaults to the values in the **"<language>_INTERPRETER"**
+variables. The latter is empty by default.
+
+If `//$DISPATCH_INTERPRETER//' is empty (as it should be with compiled code),
+neither of these variables has any effect.
+
+
+= VARIABLES =
+
+: //$*_INTERPRETER//
+Language specific interpreter; default value for //$DISPATCH_INTERPRETER//.
+
+: //$DISPATCH_VERBOSE//
+If defined and not equal "0", makes //dispatch// tell the user its setup.
+
+: //$DISPATCH_TYPE//
+The name of the detected language.
+
+: //$DISPATCH_ROOT//
+The name of the root directory of the test-code tree in the source directory of
+a project. (Defaults to "$PWD".)
+
+: //$DISPATCH_BIN_ROOT//
+Like `$DISPATCH_ROOT', but in the build tree of a project. (Defaults to
+"$DISPATCH_ROOT".)
+
+
+`$DISPATCH_ROOT' and `$DISPATCH_BIN_ROOT' are used to support out-of-tree
+builds like `cmake' and other build tools support them. When an input file name
+is given as an absolute file name and if it starts with `$DISPATCH_BIN_ROOT',
+then that part is replaced by `$DISPATCH_ROOT'.
+
+
+= EXAMPLES =
+
+Here are two examples for which files are read for which file types.
+
+0001-boot-scm.t:
+  /tmp/src/project/tests/scheme.env (sourced)
+  /tmp/src/project/tests/scm/0001-boot.env (sourced)
+  /tmp/src/project/tests/scm/0001-boot.setup (run)
+  /tmp/src/project/tests/scm/0001-boot.teardown (run)
+
+
+0001-getopt-c.t:
+  /tmp/src/project/tests/compiled.env (sourced)
+  /tmp/src/project/tests/c/0001-getopt.env (sourced)
+  /tmp/src/project/tests/c/0001-getopt.setup (run)
+  /tmp/src/project/tests/c/0001-getopt.teardown (run)
+
+
+= BUILD SYSTEM INTEGRATION =
+
+The included `//runtests//' script is an example of how to make use of the
+`//dispatch//' script in an existing build system. It has support for
+cmake-style out of tree builds. To create a `test' target in a cmake controlled
+project the following can be used:
+
+  add_custom_target(
+    test
+    /bin/sh ${CMAKE_SOURCE_DIR}/runtests
+            ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+
+= SEE ALSO =
+
+prove(1), cmake(1)
+
+
+= COPYRIGHT =
+
+Copyright (c) 2012 Frank Terbeck <ft@bewatermyfriend.org>, All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+  1. Redistributions of source code must retain the above
+     copyright notice, this list of conditions and the following
+     disclaimer.
+  2. Redistributions in binary form must reproduce the above
+     copyright notice, this list of conditions and the following
+     disclaimer in the documentation and/or other materials
+     provided with the distribution.
+
+ THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS OF THE
+ PROJECT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

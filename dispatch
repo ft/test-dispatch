@@ -1,0 +1,167 @@
+#!/bin/sh
+
+## Copyright (c) 2012 Frank Terbeck <ft@bewatermyfriend.org>, All rights
+## reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+##
+##   1. Redistributions of source code must retain the above
+##      copyright notice, this list of conditions and the following
+##      disclaimer.
+##   2. Redistributions in binary form must reproduce the above
+##      copyright notice, this list of conditions and the following
+##      disclaimer in the documentation and/or other materials
+##      provided with the distribution.
+##
+##  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+##  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+##  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+##  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS OF THE
+##  PROJECT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+##  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+##  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+##  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+##  OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+##  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+##  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+if [ $# -ne 1 ]; then
+    printf '# usage: dispatch <test-file>\n'
+    exit 1
+fi
+
+LC_MESSAGES=POSIX
+export LC_MESSAGES
+
+PWD=${PWD:-"$(pwd)"}
+PWD=${PWD%/}
+
+DISPATCH_ROOT=${DISPATCH_ROOT:-$PWD}
+export DISPATCH_ROOT
+DISPATCH_BIN_ROOT=${DISPATCH_BIN_ROOT:-$DISPATCH_ROOT}
+export DISPATCH_BIN_ROOT
+
+DISPATCH_VERBOSE=${DISPATCH_VERBOSE:-0}
+
+file=$1
+shift
+
+if ! test -e "$file"; then
+    printf '# Input file does not exist: "%s"\n' "$file"
+    exit 1;
+fi
+
+if ! test -r "$file"; then
+    printf '# Input file is not readable: "%s"\n' "$file"
+    exit 1;
+fi
+
+case "$file" in
+*-*.t) ;;
+*)  printf '# Malformed input file name: "%s"\n' "$file"
+    exit 1;;
+esac
+
+base=${file%-*}
+case "$base" in
+$DISPATCH_BIN_ROOT/*)
+    base="${base#$DISPATCH_BIN_ROOT/}"
+    base="${DISPATCH_ROOT}/$base"
+    ;;
+./*)
+    # With relative file names, assume that the names are relative to
+    # `$DISPATCH_ROOT'.
+    base="${base#.}"
+    base="${DISPATCH_ROOT}/$base"
+    ;;
+esac
+_test_setup="${base}.setup"
+_test_teardown="${base}.teardown"
+_test_env="${base}.env"
+
+type=${file##*-}
+type=${type%.t}
+
+case "$type" in
+hs)       # Haskell
+    DISPATCH_INTERPRETER=${HASKELL_INTERPRETER:-runhaskell}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=haskell
+    ;;
+pl)       # Perl
+    DISPATCH_INTERPRETER=${PERL_INTERPRETER:-perl}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=perl
+    ;;
+py)       # Python
+    DISPATCH_INTERPRETER=${PYTHON_INTERPRETER:-python}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=python
+    ;;
+rb)       # Ruby
+    DISPATCH_INTERPRETER=${RUBY_INTERPRETER:-ruby}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=ruby
+    ;;
+scm)      # Scheme
+    DISPATCH_INTERPRETER=${SCHEME_INTERPRETER:-guile}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=scheme
+    ;;
+sh)       # Shell
+    DISPATCH_INTERPRETER=${SHELL_INTERPRETER:-/bin/sh}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=shell
+    ;;
+c)        # Compiled executable (not just C code)
+    if ! test -x "$file"; then
+        printf '# Input file is not executable: "%s"\n' "$file"
+        exit 1;
+    fi
+    DISPATCH_INTERPRETER=
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=compiled
+    ;;
+*)
+    printf '# dispatch: Unknown type `%s: Skipping.\n' "$type"
+    ;;
+esac
+
+export DISPATCH_INTERPRETER
+export DISPATCH_INTERPRETER_OPTIONS
+export DISPATCH_TYPE
+
+_type_env="${DISPATCH_ROOT}/${DISPATCH_TYPE}.env"
+
+test -r "$_type_env" && . "$_type_env"
+test -r "$_test_env" && . "$_test_env"
+
+if [ "$DISPATCH_VERBOSE" != '0' ]; then
+    printf '# dispatch, type         : %s\n' "$DISPATCH_TYPE"
+    printf '# dispatch, root         : %s\n' "$DISPATCH_ROOT"
+    if [ "$DISPATCH_ROOT" != "$DISPATCH_BIN_ROOT" ]; then
+        printf '# dispatch, binary root  : %s\n' "$DISPATCH_BIN_ROOT"
+    fi
+    printf '# dispatch, interpreter  : %s\n' "$DISPATCH_INTERPRETER"
+    printf '# dispatch, options      : %s\n' "$DISPATCH_INTERPRETER_OPTIONS"
+    printf '# dispatch, environment  : %s\n' "$_type_env"
+    printf '# dispatch, test env.    : %s\n' "$_test_env"
+    printf '# dispatch, test setup   : %s\n' "$_test_setup"
+    printf '# dispatch, test teardown: %s\n' "$_test_teardown"
+fi
+
+test -r "$_test_setup" && "$POSIX_SHELL" "$_test_setup"
+
+if [ -n "$DISPATCH_INTERPRETER" ]; then
+    "$DISPATCH_INTERPRETER" $DISPATCH_INTERPRETER_OPTIONS "$file"
+    ret=$?
+else
+    "$file"
+    ret=$?
+fi
+
+test -r "$_test_teardown" && "$POSIX_SHELL" "$_test_teardown"
+
+exit "$ret"

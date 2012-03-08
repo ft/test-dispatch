@@ -1,0 +1,69 @@
+#!/bin/sh
+
+## Copyright (c) 2012 Frank Terbeck <ft@bewatermyfriend.org>, All rights
+## reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions
+## are met:
+##
+##   1. Redistributions of source code must retain the above
+##      copyright notice, this list of conditions and the following
+##      disclaimer.
+##   2. Redistributions in binary form must reproduce the above
+##      copyright notice, this list of conditions and the following
+##      disclaimer in the documentation and/or other materials
+##      provided with the distribution.
+##
+##  THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+##  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+##  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+##  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS OF THE
+##  PROJECT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+##  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+##  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+##  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+##  OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+##  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+##  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# This script finds all *.t files in the source and binary directories of the
+# cmake build and feeds those into Perl's TAP harness `prove'; which will use
+# the `dispatch' script, to flexibly and transparently run test programs
+# written in arbitrary languages.
+
+CMAKE_SOURCE_DIR=$1
+CMAKE_BINARY_DIR=$2
+
+export CMAKE_SOURCE_DIR
+export CMAKE_BINARY_DIR
+
+DISPATCH_ROOT="${CMAKE_SOURCE_DIR}/test"
+DISPATCH_BIN_ROOT="${CMAKE_BINARY_DIR}/test"
+
+export DISPATCH_ROOT
+export DISPATCH_BIN_ROOT
+
+if [ "$CMAKE_SOURCE_DIR" = "$CMAKE_BINARY_DIR" ]; then
+    set -- "$DISPATCH_ROOT"
+    unset DISPATCH_BIN_ROOT
+else
+    set -- "$DISPATCH_ROOT" "$DISPATCH_BIN_ROOT"
+fi
+
+DISPATCH_VERBOSE=${DISPATCH_VERBOSE:-0}
+export DISPATCH_VERBOSE
+
+RUNTESTS_PROVE_VERBOSE=${RUNTESTS_PROVE_VERBOSE:-0}
+if [ "$RUNTESTS_PROVE_VERBOSE" = 1 ]; then
+    _prove_verbose="--verbose"
+else
+    _prove_verbose=""
+fi
+
+find "$@" -name "*.t" -print \
+    | prove $_prove_verbose \
+            --color \
+            --normalize \
+            --merge \
+            --exec "sh ${CMAKE_SOURCE_DIR}/buildsys/bin/dispatch" -
