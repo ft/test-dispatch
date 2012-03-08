@@ -141,6 +141,7 @@ then that part is replaced by `$DISPATCH_ROOT'.
 Here are two examples for which files are read for which file types.
 
 0001-boot-scm.t:
+
   /tmp/src/project/tests/scheme.env (sourced)
   /tmp/src/project/tests/scm/0001-boot.env (sourced)
   /tmp/src/project/tests/scm/0001-boot.setup (run)
@@ -148,6 +149,7 @@ Here are two examples for which files are read for which file types.
 
 
 0001-getopt-c.t:
+
   /tmp/src/project/tests/compiled.env (sourced)
   /tmp/src/project/tests/c/0001-getopt.env (sourced)
   /tmp/src/project/tests/c/0001-getopt.setup (run)
