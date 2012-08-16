@@ -40,6 +40,7 @@ export CMAKE_BINARY_DIR
 
 DISPATCH_ROOT="${3:-${CMAKE_SOURCE_DIR}/test}"
 DISPATCH_BIN_ROOT="${4:-${CMAKE_BINARY_DIR}/test}"
+DISPATCH_SCRIPT="${5:-${CMAKE_SOURCE_DIR}/buildsys/bin/dispatch}"
 
 export DISPATCH_ROOT
 export DISPATCH_BIN_ROOT
@@ -66,4 +67,4 @@ find "$@" -name "*.t" -print \
             --color \
             --normalize \
             --merge \
-            --exec "sh ${CMAKE_SOURCE_DIR}/buildsys/bin/dispatch" -
+            --exec "sh ${DISPATCH_SCRIPT}" -
