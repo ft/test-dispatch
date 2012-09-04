@@ -27,25 +27,83 @@
 ##  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ##  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This script finds all *.t files in the source and binary directories of the
-# cmake build and feeds those into Perl's TAP harness `prove'; which will use
-# the `dispatch' script, to flexibly and transparently run test programs
-# written in arbitrary languages.
+# This script finds all *.t files in the source and binary directories of a
+# project build tree and feeds those into Perl's TAP harness `prove'; which
+# will use the `dispatch' script, to flexibly and transparently run test
+# programs written in arbitrary languages.
 
-CMAKE_SOURCE_DIR=$1
-CMAKE_BINARY_DIR=$2
+is_option () {
+    case "$1" in
+        -*) return 0 ;;
+    esac
+    return 1;;
+}
 
-export CMAKE_SOURCE_DIR
-export CMAKE_BINARY_DIR
+need_num_args () {
+    if test "$3" -lt "$2"; then
+        printf '`%s'\'': missing argument(s).\n' "$1"
+        return 1
+    fi
+    return 0
+}
 
-DISPATCH_ROOT="${3:-${CMAKE_SOURCE_DIR}/test}"
-DISPATCH_BIN_ROOT="${4:-${CMAKE_BINARY_DIR}/test}"
-DISPATCH_SCRIPT="${5:-${CMAKE_SOURCE_DIR}/buildsys/bin/dispatch}"
+while is_option "$1"; do
+    case "$1" in
+        -binary-dir)
+            need_num_args "$1" 2 "$#" || exit 1
+            BINARY_DIR="$2"
+            shift 2
+            ;;
+        -source-dir)
+            need_num_args "$1" 2 "$#" || exit 1
+            SOURCE_DIR="$2"
+            shift 2
+            ;;
+        -dispatch)
+            need_num_args "$1" 2 "$#" || exit 1
+            DISPATCH_SCRIPT="$2"
+            shift 2
+            ;;
+        -dispatch-root)
+            need_num_args "$1" 2 "$#" || exit 1
+            DISPATCH_ROOT="$2"
+            shift 2
+            ;;
+        -dispatch-bin-root)
+            need_num_args "$1" 2 "$#" || exit 1
+            DISPATCH_BIN_ROOT="$2"
+            shift 2
+            ;;
+        -dispatch-verbose)
+            DISPATCH_VERBOSE="1"
+            shift
+            ;;
+        -verbose)
+            RUNTESTS_VERBOSE="1"
+            shift
+            ;;
+        -debug)
+            RUNTESTS_DEBUG="1"
+            shift
+            ;;
+        *)
+            printf 'Unknown option `%s'\''\n' "$1"
+            exit 2;;
+    esac
+done
 
+SOURCE_DIR=${SOURCE_DIR:-$PWD}
+BINARY_DIR=${BINARY_DIR:-$PWD}
+DISPATCH_ROOT="${DISPATCH_ROOT:-${SOURCE_DIR}/test}"
+DISPATCH_BIN_ROOT="${DISPATCH_BIN_ROOT:-${BINARY_DIR}/test}"
+DISPATCH_SCRIPT="${DISPATCH_SCRIPT:-${DISPATCH_ROOT}/dispatch}"
+
+export SOURCE_DIR
+export BINARY_DIR
 export DISPATCH_ROOT
 export DISPATCH_BIN_ROOT
 
-if [ "$CMAKE_SOURCE_DIR" = "$CMAKE_BINARY_DIR" ]; then
+if [ "$SOURCE_DIR" = "$BINARY_DIR" ]; then
     set -- "$DISPATCH_ROOT"
     unset DISPATCH_BIN_ROOT
 else
@@ -55,11 +113,24 @@ fi
 DISPATCH_VERBOSE=${DISPATCH_VERBOSE:-0}
 export DISPATCH_VERBOSE
 
-RUNTESTS_PROVE_VERBOSE=${RUNTESTS_PROVE_VERBOSE:-0}
-if [ "$RUNTESTS_PROVE_VERBOSE" = 1 ]; then
+RUNTESTS_VERBOSE=${RUNTESTS_VERBOSE:-0}
+if [ "$RUNTESTS_VERBOSE" = 1 ]; then
     _prove_verbose="--verbose"
 else
     _prove_verbose=""
+fi
+
+if [ "$RUNTESTS_DEBUG" = 1 ]; then
+    printf 'runtests environment:\n'
+    printf '---------------------\n\n'
+    printf '  SOURCE_DIR:        "%s"\n' "$SOURCE_DIR"
+    printf '  BINARY_DIR:        "%s"\n' "$BINARY_DIR"
+    printf '  DISPATCH_SCRIPT:   "%s"\n' "$DISPATCH_SCRIPT"
+    printf '  DISPATCH_ROOT:     "%s"\n' "$DISPATCH_ROOT"
+    printf '  DISPATCH_BIN_ROOT: "%s"\n' "$DISPATCH_BIN_ROOT"
+    printf '  RUNTESTS_VERBOSE:  "%s"\n' "$RUNTESTS_VERBOSE"
+    printf '  RUNTESTS_DEBUG:    "%s"\n' "$RUNTESTS_DEBUG"
+    printf '  _prove_verbose:    "%s"\n' "$_prove_verbose"
 fi
 
 find "$@" -name "*.t" -print \
