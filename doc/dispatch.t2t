@@ -162,12 +162,14 @@ The included `//runtests//' script is an example of how to make use of the
 `//dispatch//' script in an existing build system. It has support for
 cmake-style out of tree builds. To create a `test' target in a cmake controlled
 project the following can be used:
-
+\
+```
   add_custom_target(
     test
-    /bin/sh ${CMAKE_SOURCE_DIR}/runtests
-            ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}
+    /bin/sh ${CMAKE_SOURCE_DIR}/runtests -source-dir ${CMAKE_SOURCE_DIR}
+                                         -binary-dir ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+```
 
 
 = SEE ALSO =
