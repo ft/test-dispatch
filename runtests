@@ -121,8 +121,8 @@ else
 fi
 
 if [ "$RUNTESTS_DEBUG" = 1 ]; then
-    printf 'runtests environment:\n'
-    printf '---------------------\n\n'
+    printf ' runtests environment:\n'
+    printf ' ---------------------\n\n'
     printf '  SOURCE_DIR:        "%s"\n' "$SOURCE_DIR"
     printf '  BINARY_DIR:        "%s"\n' "$BINARY_DIR"
     printf '  DISPATCH_SCRIPT:   "%s"\n' "$DISPATCH_SCRIPT"
@@ -131,6 +131,7 @@ if [ "$RUNTESTS_DEBUG" = 1 ]; then
     printf '  RUNTESTS_VERBOSE:  "%s"\n' "$RUNTESTS_VERBOSE"
     printf '  RUNTESTS_DEBUG:    "%s"\n' "$RUNTESTS_DEBUG"
     printf '  _prove_verbose:    "%s"\n' "$_prove_verbose"
+    printf ' ---------------------\n\n'
 fi
 
 find "$@" -name "*.t" -print \
