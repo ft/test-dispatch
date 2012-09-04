@@ -135,6 +135,7 @@ fi
 
 find "$@" -name "*.t" -print \
     | sed -e 's,^./,,' \
+    | sort \
     | prove $_prove_verbose \
             --color \
             --normalize \
