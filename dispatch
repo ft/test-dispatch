@@ -90,6 +90,11 @@ cl)       # Common Lisp
     DISPATCH_INTERPRETER_OPTIONS=
     DISPATCH_TYPE=common-lisp
     ;;
+clj)      # Clojure
+    DISPATCH_INTERPRETER=${CLOJURE_INTERPRETER:-clojure}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=clojure
+    ;;
 hs)       # Haskell
     DISPATCH_INTERPRETER=${HASKELL_INTERPRETER:-runhaskell}
     DISPATCH_INTERPRETER_OPTIONS=
