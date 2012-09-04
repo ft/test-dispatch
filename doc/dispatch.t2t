@@ -104,7 +104,8 @@ The interpreter used to run a piece of code is in the
 `//$DISPATCH_INTERPRETER_OPTIONS//' variable.
 
 The former defaults to the values in the **"<language>_INTERPRETER"**
-variables. The latter is empty by default.
+variables. The latter defaults to the value of the
+**"<language>_INTERPRETER_OPTIONS"** variables.
 
 If `//$DISPATCH_INTERPRETER//' is empty (as it should be with compiled code),
 neither of these variables has any effect.
@@ -114,6 +115,10 @@ neither of these variables has any effect.
 
 : //$*_INTERPRETER//
 Language specific interpreter; default value for //$DISPATCH_INTERPRETER//.
+
+: //$*_INTERPRETER_OPTIONS//
+Language specific interpreter options; default value for
+//$DISPATCH_INTERPRETER_OPTIONS//.
 
 : //$DISPATCH_VERBOSE//
 If defined and not equal "0", makes //dispatch// tell the user its setup.
