@@ -166,8 +166,9 @@ project the following can be used:
 ```
   add_custom_target(
     test
-    /bin/sh ${CMAKE_SOURCE_DIR}/runtests -source-dir ${CMAKE_SOURCE_DIR}
-                                         -binary-dir ${CMAKE_BINARY_DIR}
+    /bin/sh ${CMAKE_SOURCE_DIR}/test-detach/runtests
+                -source-dir ${CMAKE_SOURCE_DIR}
+                -binary-dir ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 ```
 
