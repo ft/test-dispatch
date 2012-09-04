@@ -85,6 +85,11 @@ type=${file##*-}
 type=${type%.t}
 
 case "$type" in
+cl)       # Common Lisp
+    DISPATCH_INTERPRETER=${COMMON_LISP_INTERPRETER:-clisp}
+    DISPATCH_INTERPRETER_OPTIONS=
+    DISPATCH_TYPE=common-lisp
+    ;;
 hs)       # Haskell
     DISPATCH_INTERPRETER=${HASKELL_INTERPRETER:-runhaskell}
     DISPATCH_INTERPRETER_OPTIONS=
