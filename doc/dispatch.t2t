@@ -54,16 +54,17 @@ what language a file is implemented in (see //RECOGNISED LANGUAGES// below).
 Here is a list of recognised languages tags, with their associated interpreter
 environment variables and their default values:
 
+: **c**: //Compiled Code// (**No interpreter**)
+: **cl**: //Common Lisp// ($COMMON_LISP_INTERPRETER, default: "clisp")
+: **clj**: //Clojure// ($CLOJURE_INTERPRETER, default: "clojure")
 : **hs**: //Haskell// ($HASKELL_INTERPRETER, default: "runhaskell")
+: **lua**: //Lua// ($LUA_INTERPRETER), default: "lua")
 : **pl**: //Perl// ($PERL_INTERPRETER, default: "perl")
 : **py**: //Python// ($PYTHON_INTERPRETER, default: "python")
 : **rb**: //Ruby// ($RUBY_INTERPRETER, default: "ruby")
+: **scala**: //Scala// ($SCALA_INTERPRETER, default: "scala")
 : **scm**: //Scheme// ($SCHEME_INTERPRETER, default: "guile")
 : **sh**: //Shell// ($SHELL_INTERPRETER, default: "/bin/sh")
-
-
-And to support compiled code from any language, too, the `**c**' language
-identifier was introduced (`c' for **c**ompiled code, not just the C language).
 
 
 = DISPATCHING SEQUENCE =
