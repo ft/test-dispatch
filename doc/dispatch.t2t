@@ -177,6 +177,43 @@ project the following can be used:
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 ```
 
+The `//runtests//' script sports a number of options, namely:
+
+: **-binary-dir DIR**
+
+The projects binary directory root. Defauls the the value of the
+`//-source-dir//' option.
+
+: **-source-dir DIR**
+
+The projects source directory root. Defaults to `//$PWD//' if unspecified.
+
+: **-dispatch FILE**
+
+Path name of `//dispatch//' script. Defaults to
+`//<source-dir>/test-dispatch/dispatch//'
+
+: **-dispatch-root DIR**
+
+Specifies the root directory of the test-tree. Default: `//<source-dir>/test//'
+
+: **-dispatch-bin-root DIR**
+
+Specifies the root directory of the binary test-tree. Default:
+`//<binary-dir>/test//'
+
+: **-dispatch-verbose**
+
+Turns on verbosity in the `//dispatch//' script.
+
+: **-verbose**
+
+Turns on verbosity in Perl's `//prove//' TAP harness.
+
+: **-debug**
+
+Turns on debugging output within the `//runtests//' script.
+
 
 = SEE ALSO =
 
