@@ -135,7 +135,7 @@ if [ "$RUNTESTS_DEBUG" = 1 ]; then
 fi
 
 find "$@" -name "*.t" -print \
-    | sed -e 's,^./,,' \
+    | sed -e 's,^\./,,' \
     | sort \
     | prove $_prove_verbose \
             --color \
