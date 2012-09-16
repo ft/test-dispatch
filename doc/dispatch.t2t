@@ -203,6 +203,11 @@ Specifies the root directory of the test-tree. Default: `//<source-dir>/test//'
 Specifies the root directory of the binary test-tree. Default:
 `//<binary-dir>/test//'
 
+: **-export VARIABLE VALUE**
+
+Adds the variable `//VARIABLE//' with the value `//VALUE//' to the environment
+of all children of the `//untests//'.
+
 : **-dispatch-verbose**
 
 Turns on verbosity in the `//dispatch//' script.
