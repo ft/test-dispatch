@@ -208,6 +208,12 @@ Specifies the root directory of the binary test-tree. Default:
 Adds the variable `//VARIABLE//' with the value `//VALUE//' to the environment
 of all children of the `//untests//'.
 
+: **-strip-test PREFIX**
+
+Strip `//PREFIX//' from a test's filename before feeding it into
+`//dispatch//'. This option may be used for cosmetic purposes, for example in
+case absolute path-names are used and the working directory is known.
+
 : **-dispatch-verbose**
 
 Turns on verbosity in the `//dispatch//' script.

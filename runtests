@@ -47,6 +47,17 @@ need_num_args () {
     return 0
 }
 
+stripper=''
+strip_test () {
+    if test "x$stripper" = x; then
+        cat
+    else
+        while IFS= read -r test; do
+            printf '%s\n' "${test#$stripper}"
+        done
+    fi
+}
+
 while is_option "$1"; do
     case "$1" in
         -binary-dir)
@@ -79,6 +90,11 @@ while is_option "$1"; do
             eval "$2=$3"
             export "$2"
             shift 3
+            ;;
+        -strip-test)
+            need_num_args "$1" 3 "$#" || exit 1
+            stripper="$2"
+            shift 2
             ;;
         -dispatch-verbose)
             DISPATCH_VERBOSE="1"
@@ -142,6 +158,7 @@ fi
 
 find "$@" -name "*.t" -print \
     | sed -e 's,^\./,,' \
+    | strip_test \
     | sort \
     | prove $_prove_verbose \
             --color \
