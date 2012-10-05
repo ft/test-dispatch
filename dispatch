@@ -48,6 +48,13 @@ DISPATCH_VERBOSE=${DISPATCH_VERBOSE:-0}
 file=$1
 shift
 
+# With out-of-tree builds and `--strip-roots' used with `runtests', $file might
+# not be found, if it is not a compiled test. This makes sure such files are
+# found.
+if ! test -e "$file"; then
+    test -e "${DISPATCH_ROOT}/$file" && file="${DISPATCH_ROOT}/$file"
+fi
+
 if ! test -e "$file"; then
     printf '# Input file does not exist: "%s"\n' "$file"
     exit 1;
