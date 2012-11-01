@@ -1,0 +1,110 @@
+# NAME
+
+runtests - Find tests and run them in Perl's harness via \`*dispatch*'
+
+
+# SYNOPSIS
+
+*runtests*\ [**OPTION(s)**...]
+
+Within \`*cmake*' that might look like this:
+
+    add_custom_target(
+      test
+      /bin/sh ${CMAKE_SOURCE_DIR}/test-detach/runtests
+                  -source-dir ${CMAKE_SOURCE_DIR}
+                  -binary-dir ${CMAKE_BINARY_DIR}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+
+# DESCRIPTION
+
+While \`*dispatch*' runs tests in a controlled and tunable environment,
+\`*runtests*' uses \`*find*(1)' to gather a list of test scripts and feeds them
+into Perl's \`*prove*(1)' harness with an appropriate set of options. It also
+makes sure, that \`*prove*' uses \`*dispatch*' to actually call the test
+scripts, thus making sure that test scripts written in multiple languages run
+within the same harness.
+
+
+# OPTIONS
+
+**-binary-dir DIR**
+
+:   The projects binary directory root. Defauls the the value of the
+    \`*-source-dir*' option.
+
+**-source-dir DIR**
+
+:   The projects source directory root. Defaults to \`*\$PWD*' if unspecified.
+
+**-dispatch FILE**
+
+:   Path name of \`*dispatch*' script. Defaults to
+    \`//\<source-dir\>/test-dispatch/dispatch//'
+
+**-dispatch-root DIR**
+
+:   Specifies the root directory of the test-tree. Default:
+    \`*\<source-dir\>/test*'
+
+**-dispatch-bin-root DIR**
+
+:   Specifies the root directory of the binary test-tree. Default:
+    \`*\<binary-dir\>/test*'
+
+**-export VARIABLE VALUE**
+
+:   Adds the variable \`*VARIABLE*' with the value \`*VALUE*' to the
+    environment of all children of the \`*untests*'.
+
+**-strip-roots**
+
+:   Strip \`*DISPATCH\_ROOT*' and *DISPATCH\_BIN\_ROOT* from a test's
+    filename before feeding it into \`*dispatch*'. This option may be used
+    for cosmetic purposes, for example in case absolute path-names are used
+    and the working directory is known.
+
+**-dispatch-verbose**
+
+:   Turns on verbosity in the \`*dispatch*' script.
+
+**-verbose**
+
+:   Turns on verbosity in Perl's \`*prove*' TAP harness.
+
+**-debug**
+
+:   Turns on debugging output within the \`*runtests*' script.
+
+
+# SEE ALSO
+
+*dispatch(1)*, *prove(1)*, *cmake(1)*
+
+
+# COPYRIGHT
+
+Copyright (c) 2012 Frank Terbeck <ft@bewatermyfriend.org>, All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above
+     copyright notice, this list of conditions and the following
+     disclaimer.
+  2. Redistributions in binary form must reproduce the above
+     copyright notice, this list of conditions and the following
+     disclaimer in the documentation and/or other materials
+     provided with the distribution.
+
+ THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR
+ OR CONTRIBUTORS OF THE PROJECT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
