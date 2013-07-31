@@ -152,7 +152,7 @@ c)        # Compiled executable (not just C code)
     DISPATCH_TYPE=compiled
     ;;
 *)
-    printf '# dispatch-test: Unknown type `%s: Skipping.\n' "$type"
+    printf '# dispatch-test: Unknown type `%s'\'': Skipping.\n' "$type"
     ;;
 esac
 
