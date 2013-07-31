@@ -1,0 +1,15 @@
+  run-tests - Run tests in various languages in one test-harness
+
+For details on operation, see the included manuals.
+
+To generate documentation, you need `pandoc' installed. Then do:
+
+  % make doc
+
+To install the software to a default PREFIX of /usr/local, do:
+
+  # make install
+
+If another PREFIX is required, you can set it like this:
+
+  % make install PREFIX="$HOME"
