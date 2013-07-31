@@ -1,30 +1,29 @@
 # NAME
 
-runtests - Find tests and run them in Perl's harness via \`*dispatch*'
+run-tests - Find tests and run them in Perl's harness via \`*dispatch-test*'
 
 
 # SYNOPSIS
 
-*runtests*\ [**OPTION(s)**...]
+*run-tests*\ [**OPTION(s)**...]
 
 Within \`*cmake*' that might look like this:
 
     add_custom_target(
       test
-      /bin/sh ${CMAKE_SOURCE_DIR}/test-detach/runtests
-                  -source-dir ${CMAKE_SOURCE_DIR}
-                  -binary-dir ${CMAKE_BINARY_DIR}
+      run-tests -source-dir ${CMAKE_SOURCE_DIR}
+                -binary-dir ${CMAKE_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 
 
 # DESCRIPTION
 
-While \`*dispatch*' runs tests in a controlled and tunable environment,
-\`*runtests*' uses \`*find*(1)' to gather a list of test scripts and feeds them
-into Perl's \`*prove*(1)' harness with an appropriate set of options. It also
-makes sure, that \`*prove*' uses \`*dispatch*' to actually call the test
-scripts, thus making sure that test scripts written in multiple languages run
-within the same harness.
+While \`*dispatch-test*' runs tests in a controlled and tunable environment,
+\`*run-tests*' uses \`*find*(1)' to gather a list of test scripts and feeds
+them into Perl's \`*prove*(1)' harness with an appropriate set of options. It
+also makes sure, that \`*prove*' uses \`*dispatch-test*' to actually call the
+test scripts, thus making sure that test scripts written in multiple languages
+run within the same harness.
 
 
 # OPTIONS
@@ -40,8 +39,7 @@ within the same harness.
 
 **-dispatch FILE**
 
-:   Path name of \`*dispatch*' script. Defaults to
-    \`//\<source-dir\>/test-dispatch/dispatch//'
+:   Path name of \`*dispatch-test*' script. Defaults to \`//dispatch-test//'.
 
 **-dispatch-root DIR**
 
@@ -61,13 +59,13 @@ within the same harness.
 **-strip-roots**
 
 :   Strip \`*DISPATCH\_ROOT*' and *DISPATCH\_BIN\_ROOT* from a test's
-    filename before feeding it into \`*dispatch*'. This option may be used
-    for cosmetic purposes, for example in case absolute path-names are used
-    and the working directory is known.
+    filename before feeding it into \`*dispatch-test*'. This option may be
+    used for cosmetic purposes, for example in case absolute path-names are
+    used and the working directory is known.
 
 **-dispatch-verbose**
 
-:   Turns on verbosity in the \`*dispatch*' script.
+:   Turns on verbosity in the \`*dispatch-test*' script.
 
 **-verbose**
 
@@ -75,17 +73,18 @@ within the same harness.
 
 **-debug**
 
-:   Turns on debugging output within the \`*runtests*' script.
+:   Turns on debugging output within the \`*run-tests*' script.
 
 
 # SEE ALSO
 
-*dispatch(1)*, *prove(1)*, *cmake(1)*
+*dispatch-test(1)*, *prove(1)*, *cmake(1)*
 
 
 # COPYRIGHT
 
-Copyright (c) 2012 Frank Terbeck <ft@bewatermyfriend.org>, All rights reserved.
+Copyright (c) 2012-2013 Frank Terbeck <ft@bewatermyfriend.org>, All rights
+reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

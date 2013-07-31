@@ -1,11 +1,11 @@
 # NAME
 
-dispatch - Transparently call code with different interpreters
+dispatch-test - Transparently call code with different interpreters
 
 
 # SYNOPSIS
 
-*dispatch* **PROGRAM-TO-EXECUTE**
+*dispatch-test* **PROGRAM-TO-EXECUTE**
 
 
 # DESCRIPTION
@@ -13,9 +13,10 @@ dispatch - Transparently call code with different interpreters
 If you have a test suite that is made up of code in many different languages
 and you want to run all those test files within one harness, like Perl's
 \`prove(1)', you will have to find a way to run those files with different
-interpreters with prove's \`--exec' option. *dispatch* is a way to do that.
+interpreters with prove's \`--exec' option. *dispatch-test* is a way to do
+that.
 
-It is important for this to work, that *dispatch* is able to tell which
+It is important for this to work, that *dispatch-test* is able to tell which
 interpreter is required for a file. You could just rely on scripts shebang
 lines. But what if on someone elses system the interpreter is in a different
 place? What if it's not the right interpreter at all? What if you need to pass
@@ -38,7 +39,7 @@ The constraint in \`1)' enables you to feed file-names line by line into
     prove -
 
 The constraint in \`2)' serves two purposes: 1. you can scan a deep test tree
-using find(1) looking for files that match "\*.t". 2. *dispatch* can tell,
+using find(1) looking for files that match "\*.t". 2. *dispatch-test* can tell,
 what language a file is implemented in (see *RECOGNISED LANGUAGES* below).
 
 
@@ -62,8 +63,8 @@ environment variables and their default values:
 
 # DISPATCHING SEQUENCE
 
-This section describes the operation of the *dispatch* script in detail (the
-following assumes the filename to be **"foobar-scm.t"**).
+This section describes the operation of the *dispatch-test* script in detail
+(the following assumes the filename to be **"foobar-scm.t"**).
 
 First, sanity checks are performed: Does the file exist? Is it readable? Does
 the file name match the naming policy?
@@ -115,7 +116,7 @@ neither of these variables has any effect.
     *\$DISPATCH\_INTERPRETER\_OPTIONS*.
 
 *\$DISPATCH\_VERBOSE*
-:   If defined and not equal "0", makes *dispatch* tell the user its setup.
+:   If defined and not equal "0", makes *dispatch-test* tell the user its setup.
 
 *\$DISPATCH\_TYPE*
 :   The name of the detected language.
@@ -157,27 +158,27 @@ Here are two examples for which files are read for which file types.
 
 # BUILD SYSTEM INTEGRATION
 
-The included \`*runtests*' script is an example of how to make use of the
-\`*dispatch*' script in an existing build system. It has support for
-cmake-style out of tree builds. To create a \`test' target in a cmake controlled
-project the following can be used:
+The included \`*run-tests*' script is an example of how to make use of the
+\`*dispatch-test*' script in an existing build system. It has support for
+cmake-style out of tree builds. To create a \`test' target in a cmake
+controlled project the following can be used:
 
     add_custom_target(
       test
-      /bin/sh ${CMAKE_SOURCE_DIR}/test-detach/runtests
-                  -source-dir ${CMAKE_SOURCE_DIR}
-                  -binary-dir ${CMAKE_BINARY_DIR}
+      run-tests -source-dir ${CMAKE_SOURCE_DIR}
+                -binary-dir ${CMAKE_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 
 
 # SEE ALSO
 
-*runtests(1)*, *prove(1)*, *cmake(1)*
+*run-tests(1)*, *prove(1)*, *cmake(1)*
 
 
 # COPYRIGHT
 
-Copyright (c) 2012 Frank Terbeck <ft@bewatermyfriend.org>, All rights reserved.
+Copyright (c) 2012-2013 Frank Terbeck <ft@bewatermyfriend.org>, All rights
+reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
