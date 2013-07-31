@@ -162,4 +162,4 @@ find "$@" -name "*.t" -print \
             --color \
             --normalize \
             --merge \
-            --exec "sh ${DISPATCH_SCRIPT}" -
+            --exec "${DISPATCH_SCRIPT}" -
