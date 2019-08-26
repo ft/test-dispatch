@@ -2,7 +2,7 @@ MAN = dispatch-test.1 run-tests.1
 PDF = dispatch-test.pdf run-tests.pdf
 HTML = dispatch-test.html run-tests.html
 
-COMMONOPTIONS = --self-contained --number-sections --normalize --smart --toc
+COMMONOPTIONS = --self-contained --number-sections --toc
 
 TEX_META = -V date='\today' --highlight-style=monochrome
 HTML_META = -c manual.css
