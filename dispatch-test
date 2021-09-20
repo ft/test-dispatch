@@ -27,8 +27,8 @@
 ##  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ##  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if [ $# -ne 1 ]; then
-    printf '# usage: dispatch-test <test-file>\n'
+if [ $# -lt 1 ]; then
+    printf '# usage: dispatch-test <test-file> [ARG(s)...]\n'
     exit 1
 fi
 
@@ -182,10 +182,10 @@ fi
 test -r "$_test_setup" && "$POSIX_SHELL" "$_test_setup"
 
 if [ -n "$DISPATCH_INTERPRETER" ]; then
-    "$DISPATCH_INTERPRETER" $DISPATCH_INTERPRETER_OPTIONS "$file"
+    "$DISPATCH_INTERPRETER" $DISPATCH_INTERPRETER_OPTIONS "$file" "$@"
     ret=$?
 else
-    "$file"
+    "$file" "$@
     ret=$?
 fi
 
