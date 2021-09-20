@@ -185,7 +185,7 @@ if [ -n "$DISPATCH_INTERPRETER" ]; then
     "$DISPATCH_INTERPRETER" $DISPATCH_INTERPRETER_OPTIONS "$file" "$@"
     ret=$?
 else
-    "$file" "$@
+    "$file" "$@"
     ret=$?
 fi
 
