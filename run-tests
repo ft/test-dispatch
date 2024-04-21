@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## Copyright (c) 2012-2013 Frank Terbeck <ft@bewatermyfriend.org>, All
+## Copyright (c) 2012-2024 Frank Terbeck <ft@bewatermyfriend.org>, All
 ## rights reserved.
 ##
 ## Redistribution and use in source and binary forms, with or without
@@ -90,6 +90,11 @@ while is_option "$1"; do
             export "$2"
             shift 3
             ;;
+        -harness)
+            need_num_args "$1" 2 "$#" || exit 1
+            DISPATCH_HARNESS="$2"
+            shift 2
+            ;;
         -strip-roots)
             stripper="strip_roots"
             shift
@@ -114,6 +119,7 @@ done
 
 SOURCE_DIR=${SOURCE_DIR:-$PWD}
 BINARY_DIR=${BINARY_DIR:-$PWD}
+DISPATCH_HARNESS="${DISPATCH_HARNESS:-prove}"
 DISPATCH_ROOT="${DISPATCH_ROOT:-${SOURCE_DIR}/test}"
 DISPATCH_BIN_ROOT="${DISPATCH_BIN_ROOT:-${BINARY_DIR}/test}"
 DISPATCH_SCRIPT="${DISPATCH_SCRIPT:-dispatch-test}"
@@ -145,6 +151,7 @@ if [ "$RUNTESTS_DEBUG" = 1 ]; then
     printf ' ---------------------\n\n'
     printf '  SOURCE_DIR:        "%s"\n' "$SOURCE_DIR"
     printf '  BINARY_DIR:        "%s"\n' "$BINARY_DIR"
+    printf '  DISPATCH_HARNESS:  "%s"\n' "$DISPATCH_HARNESS"
     printf '  DISPATCH_SCRIPT:   "%s"\n' "$DISPATCH_SCRIPT"
     printf '  DISPATCH_ROOT:     "%s"\n' "$DISPATCH_ROOT"
     printf '  DISPATCH_BIN_ROOT: "%s"\n' "$DISPATCH_BIN_ROOT"
@@ -158,8 +165,8 @@ find "$@" -name "*.t" -print \
     | sed -e 's,^\./,,' \
     | "$stripper" \
     | sort \
-    | prove $_prove_verbose \
-            --color \
-            --normalize \
-            --merge \
-            --exec "${DISPATCH_SCRIPT}" -
+    | "$DISPATCH_HARNESS" $_prove_verbose             \
+                          --color                     \
+                          --normalize                 \
+                          --merge                     \
+                          --exec "${DISPATCH_SCRIPT}" -
